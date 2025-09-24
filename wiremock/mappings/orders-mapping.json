@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/orders"
+  },
+  "response": {
+    "status": 200,
+    "body": "{\"message\": \"Order received\"}",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

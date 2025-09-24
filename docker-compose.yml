@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+  activemq:
+    image: rmohr/activemq:latest
+    container_name: activemq
+    ports:
+      - "61616:61616"   # JMS
+      - "8161:8161"     # ActiveMQ web console
+    environment:
+      ACTIVEMQ_ADMIN_LOGIN: admin
+      ACTIVEMQ_ADMIN_PASSWORD: admin
+
+  camel-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: camel-app
+    environment:
+      - SPRING_ACTIVEMQ_BROKER_URL=tcp://activemq:61616
+      - SPRING_ACTIVEMQ_USER=admin
+      - SPRING_ACTIVEMQ_PASSWORD=admin
+      - MOCK_REST_URL=http://wiremock:8080/orders   # point your route to WireMock
+    depends_on:
+      - activemq
+      - wiremock
+    ports:
+      - "8080:8080" # Camel REST (optional)
+
+  wiremock:
+    image: wiremock/wiremock:latest
+    container_name: wiremock
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./wiremock/mappings:/home/wiremock/mappings
