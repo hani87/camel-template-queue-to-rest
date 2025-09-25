@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/audit"
+  },
+  "response": {
+    "status": 200,
+    "body": "Audit logged",
+    "headers": {
+      "Content-Type": "text/plain"
+    }
+  }
+}

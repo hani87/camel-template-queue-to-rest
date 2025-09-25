@@ -1,14 +1,20 @@
 version: "3.8"
+
 services:
   activemq:
     image: rmohr/activemq:latest
     container_name: activemq
     ports:
-      - "61616:61616"   # JMS
+      - "62616:61616"   # JMS
       - "8161:8161"     # ActiveMQ web console
     environment:
       ACTIVEMQ_ADMIN_LOGIN: admin
       ACTIVEMQ_ADMIN_PASSWORD: admin
+
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8161" ]
+      interval: 5s
+      retries: 10
 
   camel-app:
     build:
@@ -16,20 +22,28 @@ services:
       dockerfile: Dockerfile
     container_name: camel-app
     environment:
-      - SPRING_ACTIVEMQ_BROKER_URL=tcp://activemq:61616
-      - SPRING_ACTIVEMQ_USER=admin
-      - SPRING_ACTIVEMQ_PASSWORD=admin
-      - MOCK_REST_URL=http://wiremock:8080/orders   # point your route to WireMock
+      - SPRING_PROFILES_ACTIVE=docker   # load application-docker.yml
     depends_on:
       - activemq
-      - wiremock
+      - wiremock1
+      - wiremock2
     ports:
       - "8080:8080" # Camel REST (optional)
 
-  wiremock:
+  wiremock1:
     image: wiremock/wiremock:latest
-    container_name: wiremock
+    container_name: wiremock1
     ports:
-      - "8082:8080"
+      - "8083:8080"
     volumes:
-      - ./wiremock/mappings:/home/wiremock/mappings
+      - ./wiremock/mappings1:/home/wiremock/mappings
+    command: [ "--verbose" ]
+
+  wiremock2:
+    image: wiremock/wiremock:latest
+    container_name: wiremock2
+    ports:
+      - "8082:8080" # WireMock second REST endpoint
+    volumes:
+      - ./wiremock/mappings2:/home/wiremock/mappings
+    command: [ "--verbose" ]

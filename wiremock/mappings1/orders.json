@@ -5,9 +5,9 @@
   },
   "response": {
     "status": 200,
-    "body": "{\"message\": \"Order received\"}",
+    "body": "Order received",
     "headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "text/plain"
     }
   }
 }
